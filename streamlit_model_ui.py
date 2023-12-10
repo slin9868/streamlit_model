@@ -42,7 +42,7 @@ def run_my_function():
         params_df = pickle.load(f)
     st.write(params_df.sort_values(by='aic', ascending=True))
 
-st.button("Find out Best Param Set", on_click=run_my_function)
+# st.button("Find out Best Param Set", on_click=run_my_function)
 
 #
 st.write(input_info)
