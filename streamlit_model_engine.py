@@ -60,6 +60,26 @@ retail_sales_data = retail_sales_data[retail_sales_data.index >= '2015-01-01']
 train = retail_sales_data.loc[:'2020-01']
 test = retail_sales_data.loc['2020-02-01':]
 
+# grid search best params
+
+params = []
+for trend in ['add', 'mul', None]:
+    for season in ['add', 'mul', None]:
+        for p in [12, 15, 6]:
+            hw = ExponentialSmoothing(
+                train['sales']
+                , seasonal_periods=p
+                , trend=trend
+                , seasonal=season
+                ).fit()
+
+            df_predictions['hw'] = hw.forecast(len(test))
+            rmse = mean_squared_error(df_predictions['sales'], df_predictions['hw'], squared=False)
+            params.append([trend, season, p, hw.aic, rmse])
+
+params_df = pd.DataFrame(params, columns=['trend', 'season', 'seasonal_periods', 'aic', 'rmse'])
+params_df.to_pickle('params_df.pkl')
+
 hw = ExponentialSmoothing(
     train['sales']
     # , seasonal_periods=12
