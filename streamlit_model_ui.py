@@ -18,12 +18,19 @@ Deploy to Streamlit Cloud: https://streamlit.io/cloud
 
 '''
 
-import streamlit as st
+import streamlit as st 
 import numpy as np
 import pickle
 
 import matplotlib.pyplot as plt
+import requests
+from io import StringIO
+from datetime import datetime
+
 from sklearn.metrics import mean_squared_error
+import pmdarima as pmd
+from pmdarima.utils import tsdisplay
+from statsmodels.tsa.stattools import adfuller, kpss
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
 st.header('HW Model for Retail Sales Prediction')
@@ -35,16 +42,6 @@ input_info = '''
 - **Seasonal Periods:** The number of periods in a complete seasonal cycle, e.g., 4 for quarterly data or 7 for daily data with a weekly cycle.
 '''
 
-# a run button to find out best param set
-
-def run_my_function():
-    with open('params_df.pkl', 'rb') as f:
-        params_df = pickle.load(f)
-    st.write(params_df.sort_values(by='aic', ascending=True))
-
-# st.button("Find out Best Param Set", on_click=run_my_function)
-
-#
 st.write(input_info)
 
 trend_options = ["add", "mul", "additive", "multiplicative", None]
@@ -62,7 +59,7 @@ with open('train.pkl', 'rb') as f:
 
 with open('test.pkl', 'rb') as f:
     test = pickle.load(f)
-
+ 
 hw = ExponentialSmoothing(
     train['sales']
     , seasonal_periods = seasonal_periods
@@ -87,7 +84,7 @@ plt.plot(train['sales'], label='Train')
 plt.plot(test['sales'], label='Test')
 plt.plot(df_predictions['hw'], label="Holt-Winters'")
 plt.legend()
-plt.title('Forecasts with Holt-Winters');
+plt.title('Forecasts with Holt-Winters'); 
 
 st.pyplot(plt)
  
