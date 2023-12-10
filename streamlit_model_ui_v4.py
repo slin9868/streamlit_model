@@ -54,15 +54,16 @@ def run_my_function():
     
     st.write("\n")
     st.write(f'Chart with model inputs: trend = {trend}, seasonal = {seasonal}, seasonal_periods = {seasonal_periods}')
-    
     plt.figure(figsize=(12, 8))
     plt.plot(train['sales'], label='Train')
     plt.plot(test['sales'], label='Test')
     plt.plot(df_predictions['hw'], label="Holt-Winters'")
     plt.legend()
     plt.title('Forecasts with Holt-Winters'); 
-    
     st.pyplot(plt)
+
+    st.write("\n")
+    st.write(f'Grid searching param dataframe sorted by AIC ascending order')
     st.write(params_df.sort_values(by='aic', ascending=True))
  
 st.header('HW Model for Retail Sales Prediction')
