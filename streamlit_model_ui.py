@@ -72,7 +72,19 @@ df_predictions['hw'] = hw.forecast(len(test))
 
 rmse = mean_squared_error(df_predictions['sales'], df_predictions['hw'], squared=False)
 
-st.write(f'The model inputs are trend = {trend}, seasonal = {seasonal}, seasonal_periods = {seasonal_periods}')
-st.write(f'rmse = {rmse}')
+st.write(f'RMSE and Summary with model inputs : trend = {trend}, seasonal = {seasonal}, seasonal_periods = {seasonal_periods}')
+st.write(f'RMSE = {rmse}')
 st.write(hw.summary())
+
+st.write("\n")
+st.write(f'Chart with model inputs: trend = {trend}, seasonal = {seasonal}, seasonal_periods = {seasonal_periods}')
+
+plt.figure(figsize=(12, 8))
+plt.plot(train['sales'], label='Train')
+plt.plot(test['sales'], label='Test')
+plt.plot(df_predictions['hw'], label="Holt-Winters'")
+plt.legend()
+plt.title('Forecasts with Holt-Winters');
+
+st.pyplot(plt)
  
