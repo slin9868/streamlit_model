@@ -1,3 +1,4 @@
 scikit-learn
 pmdarima
 statsmodels
+matplotlib
