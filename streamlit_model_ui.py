@@ -18,23 +18,22 @@ Deploy to Streamlit Cloud: https://streamlit.io/cloud
 
 '''
 
-import streamlit as st 
+import streamlit as st
 import numpy as np
 import pickle
 
 import matplotlib.pyplot as plt
-import requests
-from io import StringIO
-from datetime import datetime
-
 from sklearn.metrics import mean_squared_error
-import pmdarima as pmd
-from pmdarima.utils import tsdisplay
-from statsmodels.tsa.stattools import adfuller, kpss
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
 st.header('HW Model for Retail Sales Prediction')
 st.write('Please enter the following information:')
+
+# Define a dictionary to store user input
+user_input = {}
+
+# Define a boolean flag to track if button was clicked
+is_button_clicked = False
 
 input_info = '''
 - **Trend:** {"add", "mul", "additive", "multiplicative", None}
@@ -44,34 +43,55 @@ input_info = '''
 
 st.write(input_info)
 
+# Use a placeholder to display the output after button click
+output_placeholder = st.empty()
+
+# Create the "Find out Best Param Set" button
+button = st.button("Find out Best Param Set")
+
+if button:
+  is_button_clicked = True
+
+# Show output only after button click
+if is_button_clicked:
+  with open('params_df.pkl', 'rb') as f:
+    params_df = pickle.load(f)
+  # Display the output using the placeholder
+  output_placeholder.write(params_df.sort_values(by='aic', ascending=True))
+
 trend_options = ["add", "mul", "additive", "multiplicative", None]
-trend = st.selectbox('Trend', trend_options)
+trend = st.selectbox('Trend', trend_options, key="trend")
+user_input["trend"] = trend
 
 seasonal_options = ["add", "mul", "additive", "multiplicative", None]
-seasonal = st.selectbox('Seasonal', seasonal_options)
+seasonal = st.selectbox('Seasonal', seasonal_options, key="seasonal")
+user_input["seasonal"] = seasonal
 
 seasonal_period_options = list(range(2,13))
-seasonal_periods = st.selectbox('Seasonal Periods', seasonal_period_options)
+seasonal_periods = st.selectbox('Seasonal Periods', seasonal_period_options, key="seasonal_periods")
+user_input["seasonal_periods"] = seasonal_periods
 
-
+# Load the pickled data
 with open('train.pkl', 'rb') as f:
-    train = pickle.load(f)
+  train = pickle.load(f)
 
 with open('test.pkl', 'rb') as f:
-    test = pickle.load(f)
- 
+  test = pickle.load(f)
+
+# Train the Holt-Winters model using user-selected parameters
 hw = ExponentialSmoothing(
-    train['sales']
-    , seasonal_periods = seasonal_periods
-    , trend = trend
-    , seasonal = seasonal
+  train['sales'],
+  seasonal_periods = seasonal_periods,
+  trend = trend,
+  seasonal = seasonal
 ).fit()
 
+# Generate predictions and calculate RMSE
 df_predictions = test.copy()
 df_predictions['hw'] = hw.forecast(len(test))
-
 rmse = mean_squared_error(df_predictions['sales'], df_predictions['hw'], squared=False)
 
+# Display relevant information and charts
 st.write(f'RMSE and Summary with model inputs : trend = {trend}, seasonal = {seasonal}, seasonal_periods = {seasonal_periods}')
 st.write(f'RMSE = {rmse}')
 st.write(hw.summary())
