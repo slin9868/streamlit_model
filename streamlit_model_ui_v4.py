@@ -81,7 +81,7 @@ trend = st.selectbox('Trend', trend_options)
 seasonal_options = ["add", "mul", "additive", "multiplicative", None]
 seasonal = st.selectbox('Seasonal', seasonal_options)
 
-seasonal_period_options = list(range(2,13))
+seasonal_period_options = list(range(2,16))
 seasonal_periods = st.selectbox('Seasonal Periods', seasonal_period_options)
 
 with open('params_df.pkl', 'rb') as f:
