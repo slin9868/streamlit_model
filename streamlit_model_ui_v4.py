@@ -43,7 +43,6 @@ def run_my_function():
         , seasonal = seasonal
     ).fit()
     
-    df_predictions = test.copy()
     df_predictions['hw'] = hw.forecast(len(test))
     
     rmse = mean_squared_error(df_predictions['sales'], df_predictions['hw'], squared=False)
@@ -93,6 +92,7 @@ with open('train.pkl', 'rb') as f:
 
 with open('test.pkl', 'rb') as f:
     test = pickle.load(f)
+    df_predictions = test.copy()
     
 st.button("Show Me", on_click=run_my_function)
 
